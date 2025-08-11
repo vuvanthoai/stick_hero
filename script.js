@@ -116,6 +116,7 @@ function resetGame() {
   console.log('=> failedScore = ', failedScore);
   if (failedScore > 0) {
     failPointElement.innerText = 'You have experienced step ' + failedScore;
+    failPointElement.style.opacity = 1;
     introductionElement.style.opacity = 0;
   } else {
     introductionElement.style.opacity = 1;
@@ -276,12 +277,13 @@ function animate(timestamp) {
         sticks.last().rotation = 90;
 
         const [nextPlatform, perfectHit] = thePlatformTheStickHits();
+        console.log('=> nextPlatform = ', nextPlatform);
         if (nextPlatform) {
           // Increase score
           score += perfectHit ? 2 : 1;
           failedScore = score;
           scoreElement.innerText = score;
-
+          failPointElement.style.opacity = 0;
           if (score > 0) {
             updateBackground();
           }
@@ -386,13 +388,15 @@ function draw() {
   ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
   drawBackground();
-
+  if (score >= 3) {
+    scoreElement.style.opacity = 0;
+    return;
+  }
   // Center main canvas area to the middle of the screen
   ctx.translate(
       (window.innerWidth - canvasWidth) / 2 - sceneOffset,
       (window.innerHeight - canvasHeight) / 2
   );
-
   // Draw scene
   drawPlatforms();
   drawHero();
@@ -446,20 +450,6 @@ function drawHero() {
     ctx.drawImage(heroImg, 0, 0, heroWidth, heroHeight);
     ctx.restore();
   }
-}
-
-function drawRoundedRect(x, y, width, height, radius) {
-  ctx.beginPath();
-  ctx.moveTo(x, y + radius);
-  ctx.lineTo(x, y + height - radius);
-  ctx.arcTo(x, y + height, x + radius, y + height, radius);
-  ctx.lineTo(x + width - radius, y + height);
-  ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
-  ctx.lineTo(x + width, y + radius);
-  ctx.arcTo(x + width, y, x + width - radius, y, radius);
-  ctx.lineTo(x + radius, y);
-  ctx.arcTo(x, y, x, y + radius, radius);
-  ctx.fill();
 }
 
 function drawSticks() {
